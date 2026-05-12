@@ -1,2 +1,2 @@
 # AI-Movie-Recommender
-Developed a full-stack AI Movie Recommendation Web Application using Flask, Scikit-learn, Pandas, SQLite, and TMDB API. Implemented content-based recommendation algorithms using cosine similarity, integrated real-time movie metadata and trailers, added genre filtering, and persistent watchlist functionality.
+Developed a full-stack AI Movie Recommendation Web Application using Flask, Scikit-learn, Pandas, SQLite, and TMDB API. Implemented content-based recommendation algorithms using cosine similarity, integrated real-time movie metadata and trailers, added genre filtering, persistent watchlist functionality, and designed a responsive Netflix-inspired UI with interactive modal components.
