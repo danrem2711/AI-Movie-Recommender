@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Movie Recommender</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <section class="hero">
+        <div class="overlay"></div>
+
+        <div class="hero-content">
+            <h1>AI Movie Recommender</h1>
+            <p>Discover movies similar to your favorites using AI-powered content similarity.</p>
+
+            <form method="POST" class="search-box">
+                <input 
+                    type="text" 
+                    name="movie" 
+                    id="movieInput"
+                    list="movieList"
+                    placeholder="Search movie title..."
+                    value="{{ selected_movie }}"
+                    required
+                >
+
+                <a href="/favorites" class="favorites-link">View Favorites</a>
+
+                <datalist id="movieList">
+                    {% for movie in movie_titles %}
+                        <option value="{{ movie }}"></option>
+                    {% endfor %}
+                </datalist>
+
+                <select name="genre" class="genre-filter">
+                    <option value="All">All Genres</option>
+
+                    {% for genre in genres %}
+                        <option value="{{ genre }}" {% if genre == selected_genre %}selected{% endif %}>
+                            {{ genre }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit">Recommend</button>
+            </form>
+        </div>
+    </section>
+
+    <main class="container">
+        {% if selected_details %}
+            <section class="selected-section movie-details-section">
+                <img src="{{ selected_details.poster }}" alt="{{ selected_details.title }}">
+
+                <div class="details-content">
+                    <span class="tag">Selected Movie</span>
+                    <h2>{{ selected_details.title }}</h2>
+
+                    <div class="details-meta">
+                        <span>⭐ {{ selected_details.rating }}</span>
+                        <span>{{ selected_details.release_date }}</span>
+                        <span>{{ selected_details.runtime }} min</span>
+                        <span>{{ selected_details.language }}</span>
+                        <span>{{ selected_details.status }}</span>
+                    </div>
+
+                    <p class="genre">{{ selected_details.genres }}</p>
+
+                    <p class="overview">
+                        {{ selected_details.overview }}
+                    </p>
+
+                    {% if selected_trailer %}
+                        <button class="trailer-btn" onclick="openTrailer('{{ selected_trailer }}')">
+                            Watch Trailer
+                        </button>
+                    {% endif %}
+                </div>
+            </section>
+        {% endif %}
+
+        {% if recommendations %}
+            <h2 class="section-title">Recommended For You</h2>
+        {% endif %}
+
+        <section class="movie-grid">
+            {% for movie in recommendations %}
+                <div class="movie-card">
+                    <img src="{{ movie.poster }}" alt="{{ movie.title }}">
+
+                    <div class="movie-info">
+                        <h3>{{ movie.title }}</h3>
+                        <p class="genre">{{ movie.genre }}</p>
+                        <p class="rating">⭐ {{ movie.rating }}</p>
+                        <p class="match-score">{{ movie.match_score }}% Match</p>
+                        <p class="description">{{ movie.description }}</p>
+
+                        {% if movie.trailer %}
+                            <button class="small-trailer-btn" onclick="openTrailer('{{ movie.trailer }}')">
+                                Watch Trailer
+                            </button>
+                            <form method="POST" action="/save_favorite" class="favorite-form">
+                                <input type="hidden" name="title" value="{{ movie.title }}">
+                                <input type="hidden" name="genre" value="{{ movie.genre }}">
+                                <input type="hidden" name="rating" value="{{ movie.rating }}">
+                                <input type="hidden" name="poster" value="{{ movie.poster }}">
+                                <input type="hidden" name="trailer" value="{{ movie.trailer }}">
+
+                                <button type="submit" class="favorite-btn">❤️ Save Favorite</button>
+                            </form>
+                        {% else %}
+                            <p class="no-trailer">Trailer unavailable</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </section>
+
+        {% if selected_movie and recommendations|length == 0 %}
+            <p class="error">No recommendations found.</p>
+        {% endif %}
+    </main>
+
+    <div id="trailerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeTrailer()">&times;</span>
+            <iframe 
+                id="trailerFrame"
+                src=""
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+
+    <script>
+        function openTrailer(trailerUrl) {
+            const modal = document.getElementById("trailerModal");
+            const frame = document.getElementById("trailerFrame");
+
+            frame.src = trailerUrl + "?autoplay=1";
+            modal.style.display = "flex";
+        }
+
+        function closeTrailer() {
+            const modal = document.getElementById("trailerModal");
+            const frame = document.getElementById("trailerFrame");
+
+            frame.src = "";
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById("trailerModal");
+
+            if (event.target === modal) {
+                closeTrailer();
+            }
+        }
+    </script>
+</body>
+</html>

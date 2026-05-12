@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Favorite Movies</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <main class="container favorites-page">
+        <a href="/" class="favorites-link">← Back to Home</a>
+
+        <h1>My Favorite Movies</h1>
+        <p class="subtitle">Your saved movie watchlist.</p>
+
+        {% if favorite_movies %}
+            <section class="movie-grid">
+                {% for movie in favorite_movies %}
+                    <div class="movie-card">
+                        <img src="{{ movie.poster }}" alt="{{ movie.title }}">
+
+                        <div class="movie-info">
+                            <h3>{{ movie.title }}</h3>
+                            <p class="genre">{{ movie.genre }}</p>
+                            <p class="rating">⭐ {{ movie.rating }}</p>
+
+                            {% if movie.trailer %}
+                                <button class="small-trailer-btn" onclick="openTrailer('{{ movie.trailer }}')">
+                                    Watch Trailer
+                                </button>
+                            {% endif %}
+
+                            <form method="POST" action="/remove_favorite/{{ movie.id }}">
+                                <button type="submit" class="remove-btn">Remove</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </section>
+        {% else %}
+            <p class="error">No favorite movies saved yet.</p>
+        {% endif %}
+    </main>
+
+    <div id="trailerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeTrailer()">&times;</span>
+            <iframe 
+                id="trailerFrame"
+                src=""
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+
+    <script>
+        function openTrailer(trailerUrl) {
+            const modal = document.getElementById("trailerModal");
+            const frame = document.getElementById("trailerFrame");
+
+            frame.src = trailerUrl + "?autoplay=1";
+            modal.style.display = "flex";
+        }
+
+        function closeTrailer() {
+            const modal = document.getElementById("trailerModal");
+            const frame = document.getElementById("trailerFrame");
+
+            frame.src = "";
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById("trailerModal");
+
+            if (event.target === modal) {
+                closeTrailer();
+            }
+        }
+    </script>
+</body>
+</html>
